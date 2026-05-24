@@ -19,8 +19,8 @@ public class CarController : MonoBehaviour {
     }
 
     [Header("Stats")]
-    [SerializeField] private float motorTorque = 60f;
-    [SerializeField] private float brakeTorque = 300f;
+    [SerializeField] private float motorTorque = 300f;
+    [SerializeField] private float brakeTorque = 1000f;
 
     [SerializeField] private float turnSensitivity = 0.6f;
     [SerializeField] private float maxSteerAngle = 45f;
@@ -41,21 +41,28 @@ public class CarController : MonoBehaviour {
     }
 
     private void Start() {
-        carRb.centerOfMass = centerOfMass;
+        //carRb.centerOfMass = centerOfMass;
     }
 
     private void Update() {
         GetInput();
+
+        Debug.Log(moveInput);
     }
 
     private void LateUpdate() {
         Move();
         Steer();
+        AnimateWheels();
     }
 
     private void GetInput() {
-        moveInput = Input.GetAxisRaw("Vertical");
+        moveInput = 0;
+
         steerInput = Input.GetAxisRaw("Horizontal");
+
+        moveInput += GameInput.Instance.GetAccelerateInput();
+        moveInput -= GameInput.Instance.GetDecelerateInput();
     }
 
     private void Move() {
@@ -64,12 +71,19 @@ public class CarController : MonoBehaviour {
         float forwardVelocityDir = Mathf.Sign(carRb.velocity.z);
 
         foreach (Wheel wheel in wheelsList) {
-            if (forwardVelocityDir * moveInput > 0) {
-                wheel.wheelCollider.motorTorque = moveInput * motorTorque;
+
+            if (currentSpeed < maxSpeed) {
+                if (forwardVelocityDir * moveInput > 0) {
+                    wheel.wheelCollider.motorTorque = moveInput * motorTorque;
+                }
+                else {
+                    wheel.wheelCollider.motorTorque = moveInput * brakeTorque;
+                }
             }
             else {
-                wheel.wheelCollider.motorTorque = moveInput * brakeTorque;
+                wheel.wheelCollider.motorTorque = 0;
             }
+
         }
 
     }
@@ -81,6 +95,15 @@ public class CarController : MonoBehaviour {
             if (wheel.axel == Axel.Front) {
                 wheel.wheelCollider.steerAngle = Mathf.Lerp(wheel.wheelCollider.steerAngle, steerAngle, turnSensitivity * Time.deltaTime);
             }
+        }
+    }
+
+    private void AnimateWheels() {
+        foreach (Wheel wheel in wheelsList) {
+            wheel.wheelCollider.GetWorldPose(out Vector3 pos, out Quaternion rot);
+
+            wheel.wheelMesh.transform.position = pos;
+            wheel.wheelMesh.transform.rotation = rot;
         }
     }
 
