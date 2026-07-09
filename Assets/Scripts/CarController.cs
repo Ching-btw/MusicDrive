@@ -15,6 +15,8 @@ public class CarController : MonoBehaviour {
     public struct Wheel {
         public GameObject wheelMesh;
         public WheelCollider wheelCollider;
+        public GameObject wheelEffectsObj;
+        public ParticleSystem smokeParticles;
         public Axel axel;
     }
 
@@ -41,19 +43,18 @@ public class CarController : MonoBehaviour {
     }
 
     private void Start() {
-        //carRb.centerOfMass = centerOfMass;
+        carRb.centerOfMass = centerOfMass;
     }
 
     private void Update() {
         GetInput();
-
-        Debug.Log(moveInput);
     }
 
     private void LateUpdate() {
         Move();
         Steer();
         AnimateWheels();
+        WheelEffects();
     }
 
     private void GetInput() {
@@ -107,6 +108,16 @@ public class CarController : MonoBehaviour {
         }
     }
 
-
+    private void WheelEffects() {
+        foreach(Wheel wheel in wheelsList) {
+            if (Input.GetKey(KeyCode.Space) && wheel.axel == Axel.Back && wheel.wheelCollider.isGrounded && carRb.velocity.magnitude >= 12.5f) {
+                wheel.wheelEffectsObj.GetComponentInChildren<TrailRenderer>().emitting = true;
+                wheel.smokeParticles.Emit(1);
+            }
+            else {
+                wheel.wheelEffectsObj.GetComponentInChildren<TrailRenderer>().emitting = false;
+            }
+        }
+    }
 
 }
