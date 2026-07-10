@@ -497,7 +497,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSmoothness: 10
   rotSmoothness: 10
-  moveOffset: {x: 0, y: 2, z: -4}
+  moveOffset: {x: 0, y: 3, z: -7}
   rotOffset: {x: 0, y: 0, z: -1}
   carTarget: {fileID: 583025276}
 --- !u!1 &410087039
@@ -762,8 +762,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b0881d504e65fb4893a5412fc1c8e78, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motorTorque: 1000
-  brakeTorque: 3000
+  motorTorque: 2000
+  brakeTorque: 5000
   turnSensitivity: 5
   maxSteerAngle: 60
   maxSpeed: 60000
@@ -801,16 +801,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6dc2fe39f83a164dbb19a36bde51c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  activeTime: 0.2
+  activeTime: 50
   meshRefreshRate: 0.05
-  meshDestroyDelay: 0.5
+  meshDestroyDelay: 2
   positionToSpawn: {fileID: 583025276}
-  bodyMesh: {fileID: -8039613103989778838, guid: d3109e1c4f8a5b04c9dec1fa184fd706,
-    type: 3}
-  trailMat: {fileID: 2100000, guid: fa7e7598ae5dbdc43bd06f959614940b, type: 2}
   shaderVarRef: _alpha
-  shaderVarRate: 0.05
-  shaderVarRefreshRate: 0.025
+  shaderVarRate: 0.2
+  shaderVarRefreshRate: 0.1
+  trailRefObjList:
+  - meshObject: {fileID: 919132147974811606}
+    mat: {fileID: 2100000, guid: fa7e7598ae5dbdc43bd06f959614940b, type: 2}
+  - meshObject: {fileID: 6252139898355955498}
+    mat: {fileID: 2100000, guid: e0b6c34357c81ba4b90f75e77ed86f9a, type: 2}
+  - meshObject: {fileID: 1674656798757990249}
+    mat: {fileID: 2100000, guid: e0b6c34357c81ba4b90f75e77ed86f9a, type: 2}
+  - meshObject: {fileID: 8675190190842591111}
+    mat: {fileID: 2100000, guid: e0b6c34357c81ba4b90f75e77ed86f9a, type: 2}
+  - meshObject: {fileID: 5483137061818520676}
+    mat: {fileID: 2100000, guid: e0b6c34357c81ba4b90f75e77ed86f9a, type: 2}
 --- !u!1001 &752182139
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BlueGlow
+  m_Name: YellowGlow
   m_Shader: {fileID: -6465566751694194690, guid: 28dcdfa545cf7dc4a840116559445bbe,
     type: 3}
   m_Parent: {fileID: 0}
@@ -70,5 +70,5 @@ Material:
     - _alpha: 1
     - _fresnelPower: 2
     m_Colors:
-    - _Color: {r: 0, g: 1.9971638, b: 4, a: 0.27058825}
+    - _Color: {r: 3.9999995, g: 2.950822, b: 0, a: 0.3921569}
   m_BuildTextureStacks: []

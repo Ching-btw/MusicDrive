@@ -1,66 +1,85 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MeshTrail : MonoBehaviour {
 
+    [Serializable]
+    struct TrailRefObj {
+        public GameObject meshObject;
+        public Material mat;
+    }
+
+    struct TrailMesh {
+        public Mesh mesh;
+        public Material mat;
+        public Transform trans;
+    }
+
     [SerializeField] private float activeTime = 0.2f;
     [SerializeField] private float meshRefreshRate = 0.05f;
     [SerializeField] private float meshDestroyDelay = 0.5f;
     [SerializeField] private Transform positionToSpawn;
-    [SerializeField] private Mesh bodyMesh;
-    [SerializeField] private Material trailMat;
     [SerializeField] private string shaderVarRef;
     [SerializeField] private float shaderVarRate = 0.05f;
     [SerializeField] private float shaderVarRefreshRate = 0.025f;
 
+    [Space]
+    [SerializeField] private List<TrailRefObj> trailRefObjList;
+
     private bool isTrailActive;
-    private MeshRenderer[] meshRenderers;
-    private MeshFilter[] meshFilters;
-    private Mesh combinedMesh;
+    private List<TrailMesh> trailMeshesList;
 
     private void Start() {
-        combinedMesh = new Mesh();
-        List<CombineInstance> instances = new List<CombineInstance>();
-        for (int i = 0; i < bodyMesh.subMeshCount; i++) {
-            CombineInstance ci = new CombineInstance();
-            ci.mesh = bodyMesh;
-            ci.subMeshIndex = i;
-            ci.transform = Matrix4x4.identity;
-            instances.Add(ci);
+
+        trailMeshesList = new List<TrailMesh>();
+
+        foreach (TrailRefObj obj in trailRefObjList) {
+            Mesh refMesh = obj.meshObject.GetComponent<MeshFilter>().mesh;
+            Mesh combinedMesh = new Mesh();
+            List<CombineInstance> instances = new List<CombineInstance>();
+            for (int i = 0; i < refMesh.subMeshCount; i++) {
+                CombineInstance ci = new CombineInstance();
+                ci.mesh = refMesh;
+                ci.subMeshIndex = i;
+                ci.transform = Matrix4x4.identity;
+                instances.Add(ci);
+            }
+            combinedMesh.CombineMeshes(instances.ToArray(), true);
+
+            TrailMesh newTrailMesh = new TrailMesh();
+            newTrailMesh.mesh = combinedMesh;
+            newTrailMesh.mat = obj.mat;
+            newTrailMesh.trans = obj.meshObject.transform;
+
+            trailMeshesList.Add(newTrailMesh);
         }
-        combinedMesh.CombineMeshes(instances.ToArray(), true);
-        //combinedMesh = bodyMesh;
+
     }
 
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Space) && !isTrailActive){
+        if (Input.GetKeyDown(KeyCode.Space) && !isTrailActive) {
             isTrailActive = true;
             StartCoroutine(ActivateTrail(activeTime));
         }
     }
 
     IEnumerator ActivateTrail(float timeActive) {
-        while(timeActive > 0) {
+        while (timeActive > 0) {
             timeActive -= meshRefreshRate;
 
-            if (meshRenderers == null && meshFilters == null) {
-                meshRenderers = GetComponentsInChildren<MeshRenderer>();
-                meshFilters = GetComponentsInChildren<MeshFilter>();
-            }
-
-            for(int i=0; i<meshRenderers.Length; i++) {
+            foreach (TrailMesh trailMesh in trailMeshesList) {
                 GameObject gobj = new GameObject();
-                gobj.transform.SetPositionAndRotation(positionToSpawn.position, positionToSpawn.rotation);
-                gobj.transform.localScale = Vector3.one * 100;
+                gobj.transform.SetPositionAndRotation(trailMesh.trans.position, trailMesh.trans.rotation);
+                gobj.transform.localScale = trailMesh.trans.localScale;
 
                 MeshRenderer mr = gobj.AddComponent<MeshRenderer>();
                 MeshFilter mf = gobj.AddComponent<MeshFilter>();
 
-
-                mf.mesh = combinedMesh;
-                mr.material = trailMat;
+                mf.mesh = trailMesh.mesh;
+                mr.material = trailMesh.mat;
 
                 StartCoroutine(AnimateMaterialFloat(mr.material, 0, shaderVarRate, shaderVarRefreshRate));
 
@@ -76,7 +95,7 @@ public class MeshTrail : MonoBehaviour {
     IEnumerator AnimateMaterialFloat(Material mat, float goal, float rate, float refreshRate) {
         float valueToAnimate = mat.GetFloat(shaderVarRef);
 
-        while(valueToAnimate > goal) {
+        while (valueToAnimate > goal) {
             valueToAnimate -= rate;
             mat.SetFloat(shaderVarRef, valueToAnimate);
 
@@ -85,3 +104,4 @@ public class MeshTrail : MonoBehaviour {
     }
 
 }
+
